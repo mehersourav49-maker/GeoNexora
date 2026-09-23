@@ -1,2 +1,123 @@
-import {useEffect,useState} from 'react'; import {api,type Sensor} from '../api/client'; import EvacuationCountdownCard from '../components/dashboard/EvacuationCountdownCard'; import MultiHazardGauges from '../components/dashboard/MultiHazardGauges'; import TelemetryStream from '../components/dashboard/TelemetryStream'; import HazardMap from '../components/live-map/HazardMap';
-export default function DashboardPage(){const [sensors,setSensors]=useState<Sensor[]>([]); const [shelters,setShelters]=useState<any[]>([]); const [risk,setRisk]=useState<any>(null); useEffect(()=>{Promise.all([api.get('/api/monitoring/sensors'),api.get('/api/logistics/shelters'),api.get('/api/monitoring/sensors/1/risk')]).then(([a,b,c])=>{setSensors(a.data);setShelters(b.data);setRisk(c.data)})},[]); const t=sensors[0]?.latest; return <><div className="page-head"><div><span className="eyebrow">COMMAND DASHBOARD</span><h1>Situational Awareness</h1><p>Multi-source hydrology, slope susceptibility and evacuation intelligence for Himalayan river corridors.</p></div>{risk&&<EvacuationCountdownCard min={risk.lead_time.lead_time_hours_min} max={risk.lead_time.lead_time_hours_max} threat={risk.lead_time.threat_level}/>}</div><div className="kpis"><div><span>ACTIVE SENSORS</span><strong>{sensors.filter(x=>x.active).length}/{sensors.length}</strong></div><div><span>RELIEF SHELTERS</span><strong>{shelters.length}</strong></div><div><span>THREAT LEVEL</span><strong className={risk?.fusion.threat_level.toLowerCase()}>{risk?.fusion.threat_level||'—'}</strong></div><div><span>DATA SOURCES</span><strong>4+</strong></div></div><div className="dashboard-grid"><section className="panel map-panel"><div className="panel-head"><div><span>GIS HAZARD MAP</span><h2>Chamoli · Joshimath corridor</h2></div></div><HazardMap sensors={sensors} shelters={shelters}/></section><section className="panel"><span>LIVE TELEMETRY</span><h2>Multi-hazard conditions</h2>{t?<MultiHazardGauges rain={t.rainfall_mm_h} soil={t.soil_saturation_pct} flow={t.river_flow_m3s}/>:<p>No telemetry.</p>}<TelemetryStream sensors={sensors.slice(0,5)}/></section></div></>}
+import { useEffect, useState } from 'react';
+import { api, type Sensor } from '../api/client';
+import EvacuationCountdownCard from '../components/dashboard/EvacuationCountdownCard';
+import MultiHazardGauges from '../components/dashboard/MultiHazardGauges';
+import TelemetryStream from '../components/dashboard/TelemetryStream';
+import HazardMap from '../components/live-map/HazardMap';
+
+export default function DashboardPage() {
+  const [sensors, setSensors] = useState<Sensor[]>([]);
+  const [shelters, setShelters] = useState<any[]>([]);
+  const [risk, setRisk] = useState<any>(null);
+
+  useEffect(() => {
+    api.get('/api/monitoring/sensors')
+      .then((response) => {
+        console.log('GeoNexora sensors:', response.data);
+        setSensors(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to load sensors:', error);
+      });
+
+    api.get('/api/logistics/shelters')
+      .then((response) => {
+        setShelters(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to load shelters:', error);
+      });
+
+    api.get('/api/monitoring/sensors/1/risk')
+      .then((response) => {
+        setRisk(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to load sensor risk:', error);
+      });
+  }, []);
+
+  const t = sensors[0]?.latest;
+
+  return (
+    <>
+      <div className="page-head">
+        <div>
+          <span className="eyebrow">COMMAND DASHBOARD</span>
+          <h1>Situational Awareness</h1>
+          <p>
+            Multi-source hydrology, slope susceptibility and evacuation
+            intelligence for Himalayan river corridors.
+          </p>
+        </div>
+
+        {risk && (
+          <EvacuationCountdownCard
+            min={risk.lead_time.lead_time_hours_min}
+            max={risk.lead_time.lead_time_hours_max}
+            threat={risk.lead_time.threat_level}
+          />
+        )}
+      </div>
+
+      <div className="kpis">
+        <div>
+          <span>ACTIVE SENSORS</span>
+          <strong>
+            {sensors.filter((x) => x.active).length}/{sensors.length}
+          </strong>
+        </div>
+
+        <div>
+          <span>RELIEF SHELTERS</span>
+          <strong>{shelters.length}</strong>
+        </div>
+
+        <div>
+          <span>THREAT LEVEL</span>
+          <strong className={risk?.fusion?.threat_level?.toLowerCase() || ''}>
+            {risk?.fusion?.threat_level || '—'}
+          </strong>
+        </div>
+
+        <div>
+          <span>DATA SOURCES</span>
+          <strong>4+</strong>
+        </div>
+      </div>
+
+      <div className="dashboard-grid">
+        <section className="panel map-panel">
+          <div className="panel-head">
+            <div>
+              <span>GIS HAZARD MAP</span>
+              <h2>Chamoli · Joshimath corridor</h2>
+            </div>
+          </div>
+
+          <HazardMap
+            sensors={sensors}
+            shelters={shelters}
+          />
+        </section>
+
+        <section className="panel">
+          <span>LIVE TELEMETRY</span>
+          <h2>Multi-hazard conditions</h2>
+
+          {t ? (
+            <MultiHazardGauges
+              rain={t.rainfall_mm_h}
+              soil={t.soil_saturation_pct}
+              flow={t.river_flow_m3s}
+            />
+          ) : (
+            <p>No telemetry.</p>
+          )}
+
+          <TelemetryStream sensors={sensors.slice(0, 5)} />
+        </section>
+      </div>
+    </>
+  );
+}

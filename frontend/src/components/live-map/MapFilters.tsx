@@ -1,0 +1,1 @@
+export default function MapFilters(){return <div className="filters"><span>Layers</span><label><input type="checkbox" defaultChecked/> IoT sensors</label><label><input type="checkbox" defaultChecked/> Shelter coverage</label><label><input type="checkbox" defaultChecked/> Inundation zones</label></div>}

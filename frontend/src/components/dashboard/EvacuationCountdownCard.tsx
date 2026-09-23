@@ -1,0 +1,1 @@
+export default function EvacuationCountdownCard({min,max,threat}:{min:number;max:number;threat:string}){return <div className="countdown"><span>EVACUATION WINDOW</span><strong>{min.toFixed(1)}–{max.toFixed(1)} h</strong><b className={threat.toLowerCase()}>{threat}</b><small>Estimated time-to-criticality from current telemetry</small></div>}

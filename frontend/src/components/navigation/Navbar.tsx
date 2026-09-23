@@ -1,0 +1,2 @@
+import {ShieldCheck,RadioTower} from 'lucide-react';
+export default function Navbar(){return <header className="navbar"><div className="brand"><div className="logo"><ShieldCheck size={22}/></div><div><strong>GeoNexora</strong><span>HYPER-LOCAL FLOOD INTELLIGENCE</span></div></div><div className="online"><i/> SYSTEM ONLINE <b/> DATABASE READY</div><button className="sos"><RadioTower size={15}/> SOS BROADCAST</button></header>}

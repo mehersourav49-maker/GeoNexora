@@ -21,5 +21,6 @@ npm run dev
 Open http://localhost:5173.
 
 Set `VITE_API_URL` if the API is not on http://127.0.0.1:8000.
+VITE_API_URL= "https://geonexora.onrender.com"
 
 The simulation endpoint is intentionally in-memory and does not create an alert. The engineering calculations are screening estimates for decision support, not certified hydraulic/geotechnical models.

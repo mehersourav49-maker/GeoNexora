@@ -5,14 +5,16 @@ class Settings(BaseSettings):
     app_name: str = "GeoNexora"
     database_url: str = "sqlite:///./geonexora.db"
 
+    
     cors_origins: str = (
         "http://localhost:5173,"
         "http://localhost:4173,"
         "http://127.0.0.1:5173,"
         "http://127.0.0.1:4173,"
-        "https://geonexora.onrender.com"
+        "https://geonexora.onrender.com,"
+        "https://geonexora-1.onrender.com,"
+        "https://geo-nexora.vercel.app"
     )
-
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"

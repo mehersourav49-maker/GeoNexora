@@ -33,4 +33,4 @@ WORKDIR /app/backend
 # Render provides PORT at runtime
 EXPOSE 10000
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
+CMD ["sh", "-c", "if [ \"${SEED_DEMO_DATA:-false}\" = \"true\" ]; then python seed_demo_data_safe.py || exit 1; fi; exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]

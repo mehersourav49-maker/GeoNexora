@@ -3,6 +3,8 @@ from sqlalchemy import String, Float, Boolean, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..core.database import Base
 
+TRANSMISSION_MODES = ("CELLULAR_4G", "LORA_MESH_865MHZ", "ESP32_CAPTIVE_HOTSPOT", "OFFLINE_BUFFER")
+
 class Sensor(Base):
     __tablename__ = "sensors"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -12,6 +14,8 @@ class Sensor(Base):
     longitude: Mapped[float] = mapped_column(Float)
     elevation_m: Mapped[float] = mapped_column(Float, default=0)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Safe migration in main.py adds this column to existing PostgreSQL/SQLite databases.
+    transmission_mode: Mapped[str] = mapped_column(String(40), default="CELLULAR_4G", nullable=False, server_default="CELLULAR_4G")
     telemetries: Mapped[list["Telemetry"]] = relationship(back_populates="sensor", cascade="all, delete-orphan")
 
 class Telemetry(Base):

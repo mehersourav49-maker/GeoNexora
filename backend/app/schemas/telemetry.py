@@ -24,5 +24,6 @@ class SensorOut(BaseModel):
     longitude: float
     elevation_m: float
     active: bool
+    transmission_mode: str = "CELLULAR_4G"
     latest: TelemetryOut | None = None
     model_config = {"from_attributes": True}

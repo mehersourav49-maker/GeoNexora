@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from sqlalchemy import inspect, text
 
 from .core.config import settings
 from .core.database import Base, engine
@@ -18,6 +19,12 @@ from .models import *
 
 # Database initialization
 Base.metadata.create_all(bind=engine)
+
+# Small additive migration keeps deployed PostgreSQL/SQLite databases compatible.
+with engine.begin() as connection:
+    columns = {column["name"] for column in inspect(connection).get_columns("sensors")}
+    if "transmission_mode" not in columns:
+        connection.execute(text("ALTER TABLE sensors ADD COLUMN transmission_mode VARCHAR(40) NOT NULL DEFAULT 'CELLULAR_4G'"))
 
 app = FastAPI(
     title=settings.app_name,
@@ -38,10 +45,12 @@ app.add_middleware(
 
 # Register existing API routers
 app.include_router(monitoring.router)
+app.include_router(monitoring.v1_router)
 app.include_router(simulation.router)
 app.include_router(logistics.router)
 app.include_router(alerts.router)
 app.include_router(analytics.router)
+app.include_router(analytics.v1_router)
 
 # The Dockerfile copies the Vite build to backend/static/
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
